@@ -15,16 +15,19 @@ class FlappyBirdEnv:
     GRAVITY = 0.45
     FLAP_STRENGTH = -7.5
 
-    def __init__(self, seed: Optional[int] = None):
+    def __init__(self, seed: Optional[int] = None, max_difficulty: float = 1.0):
         self.rng = random.Random(seed)
+        self.max_difficulty = max_difficulty
         self.reset()
 
     # ── difficulty curve (exact JS port) ──────────────────────────
     def difficulty(self) -> float:
         t = min(1.0, self.score / 30.0)
         if t < 0.5:
-            return 4 * t * t * t
-        return 1 - (-2 * t + 2) ** 3 / 2
+            d = 4 * t * t * t
+        else:
+            d = 1 - (-2 * t + 2) ** 3 / 2
+        return min(d, self.max_difficulty)
 
     def pipe_gap(self) -> float:
         return 210 - 85 * self.difficulty()
